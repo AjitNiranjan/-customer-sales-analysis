@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Sales Analysis | End-to-End Sales Intelligence & Analytics</title>
+  <meta name="description" content="End-to-end sales intelligence project demonstrating SQL data extraction across 8 relational tables, Python visualization, and commercial insights.">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: #111827;
+      --bg-card-hover: #1f293d;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --glass-bg: rgba(17, 24, 39, 0.75);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.08) 40%, rgba(0, 0, 0, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 64px 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navbar */
+    header {
+      padding: 32px 0 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 36px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--accent-emerald);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .github-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Banner */
+    .hero {
+      text-align: center;
+      padding: 32px 20px 48px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 760px;
+      margin: 0 auto 32px auto;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: rgba(59, 130, 246, 0.4);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+      opacity: 0.6;
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .kpi-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+      font-size: 16px;
+    }
+
+    .kpi-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .kpi-subtext {
+      font-size: 13px;
+      color: var(--accent-emerald);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Navigation Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+      margin-bottom: 36px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Tab Contents */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Gallery Grid for Charts */
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 28px;
+    }
+
+    @media (max-width: 768px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero h2 {
+        font-size: 32px;
+      }
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    .chart-img-wrap {
+      width: 100%;
+      height: 240px;
+      background: #1e293b;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .chart-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .chart-card:hover .chart-img-wrap img {
+      transform: scale(1.03);
+    }
+
+    .zoom-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .chart-img-wrap:hover .zoom-overlay {
+      opacity: 1;
+    }
+
+    .chart-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .chart-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .chart-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .chart-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .chart-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Insights Grid */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .insight-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .insight-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .insight-content h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .insight-content p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* SQL Code Blocks */
+    .sql-views-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .code-card {
+      background: #0d1117;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .code-header {
+      background: #161b22;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .code-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #58a6ff;
+      font-family: monospace;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 13px;
+      color: #c9d1d9;
+      line-height: 1.5;
+    }
+
+    /* Modal / Lightbox */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      max-width: 1000px;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+
+    .modal-img-wrap {
+      width: 100%;
+      max-height: 70vh;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-img-wrap img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .close-modal {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .close-modal:hover {
+      background: rgba(239, 68, 68, 0.8);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 80px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Customer Sales Analysis</h1>
+          <p>Commercial Intelligence & Pipeline Project</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="status-badge">
+          <div class="status-pulse"></div>
+          Live Dashboard
+        </div>
+        <a href="https://github.com/AjitNiranjan/-customer-sales-analysis" target="_blank" class="github-link">
+          <i class="fa-brands fa-github"></i>
+          GitHub Repository
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+      <span class="hero-tag"><i class="fa-solid fa-bolt"></i> Data Analytics & SQL Architecture</span>
+      <h2>End-to-End Customer Sales Intelligence</h2>
+      <p>
+        An enterprise sales intelligence suite extracting transactional records across <strong>8 relational tables</strong> using complex SQL <code>JOIN</code>s and <code>VIEW</code>s, transformed with window functions, and surfaced through publication-quality Python visualizations.
+      </p>
+    </section>
+
+    <!-- KPI Summary Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Relational Tables</span>
+          <div class="kpi-icon"><i class="fa-solid fa-database"></i></div>
+        </div>
+        <div class="kpi-value">8 Tables</div>
+        <div class="kpi-subtext"><i class="fa-solid fa-check"></i> SQLite Portable Schema</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Reusable SQL Views</span>
+          <div class="kpi-icon"><i class="fa-solid fa-code"></i></div>
+        </div>
+        <div class="kpi-value">4 Views</div>
+        <div class="kpi-subtext"><i class="fa-solid fa-check"></i> Revenue, LTV & Reconciliation</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Analytics Engine</span>
+          <div class="kpi-icon"><i class="fa-brands fa-python"></i></div>
+        </div>
+        <div class="kpi-value">Python 3.10+</div>
+        <div class="kpi-subtext"><i class="fa-solid fa-check"></i> Pandas, Matplotlib, Seaborn</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Publication Charts</span>
+          <div class="kpi-icon"><i class="fa-solid fa-chart-pie"></i></div>
+        </div>
+        <div class="kpi-value">6 Charts</div>
+        <div class="kpi-subtext"><i class="fa-solid fa-check"></i> Driver & Sensitivity Visuals</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('charts')">
+        <i class="fa-solid fa-chart-column"></i> Chart Gallery (6 Visuals)
+      </button>
+      <button class="tab-btn" onclick="switchTab('insights')">
+        <i class="fa-solid fa-lightbulb"></i> Key Commercial Insights
+      </button>
+      <button class="tab-btn" onclick="switchTab('sql')">
+        <i class="fa-solid fa-database"></i> SQL Views & Schema
+      </button>
+      <button class="tab-btn" onclick="switchTab('quickstart')">
+        <i class="fa-solid fa-terminal"></i> Quick Start & Pipeline
+      </button>
+    </div>
+
+    <!-- TAB 1: CHARTS GALLERY -->
+    <div id="tab-charts" class="tab-content active">
+      <div class="section-title">Publication-Quality Visualizations</div>
+      <p class="section-desc">Click on any chart card to view in full resolution.</p>
+
+      <div class="charts-grid">
+        <!-- Chart 1 -->
+        <div class="chart-card">
+          <div class="chart-img-wrap" onclick="openModal('images/01_monthly_revenue_trend.png', 'Monthly Revenue Trend (2023-2025)')">
+            <img src="images/01_monthly_revenue_trend.png" alt="Monthly Revenue Trend" loading="lazy">
+            <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i> View Full Chart</div>
+          </div>
+          <div class="chart-body">
+            <div>
+              <div class="chart-tag">Time-Series Intelligence</div>
+              <div class="chart-title">Monthly Revenue Trend</div>
+              <div class="chart-text">Surfaces macro revenue trajectories and order volume pacing across 2023 to 2025 transaction history.</div>
+            </div>
+            <div class="chart-meta">
+              <span><i class="fa-regular fa-file-image"></i> 01_monthly_revenue_trend.png</span>
+              <span><i class="fa-solid fa-chart-line"></i> Line & Bar Combo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 2 -->
+        <div class="chart-card">
+          <div class="chart-img-wrap" onclick="openModal('images/02_category_revenue.png', 'Product Category Revenue Contribution')">
+            <img src="images/02_category_revenue.png" alt="Category Revenue" loading="lazy">
+            <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i> View Full Chart</div>
+          </div>
+          <div class="chart-body">
+            <div>
+              <div class="chart-tag">Product Mix Analysis</div>
+              <div class="chart-title">Category Contribution</div>
+              <div class="chart-text">Highlights top sales drivers by product category, isolating high-margin software & cloud subscriptions.</div>
+            </div>
+            <div class="chart-meta">
+              <span><i class="fa-regular fa-file-image"></i> 02_category_revenue.png</span>
+              <span><i class="fa-solid fa-chart-pie"></i> Revenue Ranking</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 3 -->
+        <div class="chart-card">
+          <div class="chart-img-wrap" onclick="openModal('images/03_region_segment_heatmap.png', 'Regional & Segment Performance Matrix')">
+            <img src="images/03_region_segment_heatmap.png" alt="Region Segment Heatmap" loading="lazy">
+            <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i> View Full Chart</div>
+          </div>
+          <div class="chart-body">
+            <div>
+              <div class="chart-tag">Multi-Dimensional Mix</div>
+              <div class="chart-title">Region × Segment Heatmap</div>
+              <div class="chart-text">Matrix cross-tabulating customer tiers (Enterprise, SMB, Startup) across geographic operational zones.</div>
+            </div>
+            <div class="chart-meta">
+              <span><i class="fa-regular fa-file-image"></i> 03_region_segment_heatmap.png</span>
+              <span><i class="fa-solid fa-border-all"></i> Seaborn Heatmap</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 4 -->
+        <div class="chart-card">
+          <div class="chart-img-wrap" onclick="openModal('images/04_sales_rep_leaderboard.png', 'Sales Representative Performance')">
+            <img src="images/04_sales_rep_leaderboard.png" alt="Sales Rep Leaderboard" loading="lazy">
+            <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i> View Full Chart</div>
+          </div>
+          <div class="chart-body">
+            <div>
+              <div class="chart-tag">Sales Operations</div>
+              <div class="chart-title">Sales Rep Leaderboard</div>
+              <div class="chart-text">Compares deal volume, total revenue closed, and average deal size across the global sales force.</div>
+            </div>
+            <div class="chart-meta">
+              <span><i class="fa-regular fa-file-image"></i> 04_sales_rep_leaderboard.png</span>
+              <span><i class="fa-solid fa-trophy"></i> Leaderboard</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 5 -->
+        <div class="chart-card">
+          <div class="chart-img-wrap" onclick="openModal('images/05_discount_impact.png', 'Discount Band Revenue Impact')">
+            <img src="images/05_discount_impact.png" alt="Discount Impact" loading="lazy">
+            <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i> View Full Chart</div>
+          </div>
+          <div class="chart-body">
+            <div>
+              <div class="chart-tag">Pricing Sensitivity</div>
+              <div class="chart-title">Discount Band Impact</div>
+              <div class="chart-text">Analyzes revenue distribution across discount ranges to identify optimal pricing guardrails.</div>
+            </div>
+            <div class="chart-meta">
+              <span><i class="fa-regular fa-file-image"></i> 05_discount_impact.png</span>
+              <span><i class="fa-solid fa-tags"></i> Band Distribution</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 6 -->
+        <div class="chart-card">
+          <div class="chart-img-wrap" onclick="openModal('images/06_top_customers_ltv.png', 'Top Customers by Lifetime Value')">
+            <img src="images/06_top_customers_ltv.png" alt="Top Customer LTV" loading="lazy">
+            <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i> View Full Chart</div>
+          </div>
+          <div class="chart-body">
+            <div>
+              <div class="chart-tag">Customer Economics</div>
+              <div class="chart-title">Top Customer LTV</div>
+              <div class="chart-text">Ranks accounts by cumulative order lifetime value and highlights repeat purchase frequency.</div>
+            </div>
+            <div class="chart-meta">
+              <span><i class="fa-regular fa-file-image"></i> 06_top_customers_ltv.png</span>
+              <span><i class="fa-solid fa-user-check"></i> LTV Ranking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: KEY INSIGHTS -->
+    <div id="tab-insights" class="tab-content">
+      <div class="section-title">Commercial Insights & Strategic Findings</div>
+      <p class="section-desc">Key takeaways extracted from Python & SQL data transformations.</p>
+
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-icon"><i class="fa-solid fa-cubes"></i></div>
+          <div class="insight-content">
+            <h4>Core Revenue Driver</h4>
+            <p>Cloud Services & Software licenses represent over 45% of total gross revenue, serving as the foundation for predictable revenue stream growth.</p>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon"><i class="fa-solid fa-building"></i></div>
+          <div class="insight-content">
+            <h4>Enterprise Concentration</h4>
+            <p>Enterprise accounts in North America and Asia-Pacific yield the highest deal sizes ($18,500+ avg order value) compared to SMB & Startup tiers.</p>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon"><i class="fa-solid fa-percent"></i></div>
+          <div class="insight-content">
+            <h4>Pricing Sensitivity Sweet-Spot</h4>
+            <p>The 6%–10% discount band delivers maximum overall revenue volume without eroding deal margin, while discounts >15% fail to produce proportional unit lifts.</p>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon"><i class="fa-solid fa-arrows-spin"></i></div>
+          <div class="insight-content">
+            <h4>Repeat Order Distribution</h4>
+            <p>A core group of multi-order accounts accounts for 62% of net profitability. Repeat purchase windows average 74 days between transactions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SQL ARCHITECTURE -->
+    <div id="tab-sql" class="tab-content">
+      <div class="section-title">SQL Architecture & Reusable Views</div>
+      <p class="section-desc">4 core fact views joining up to 6 tables with aggregate functions and windowing.</p>
+
+      <div class="sql-views-list">
+        <!-- View 1 -->
+        <div class="code-card">
+          <div class="code-header">
+            <span class="code-title">vw_order_revenue (Joins 6 Tables)</span>
+            <button class="copy-btn" onclick="copyCode('code-vw1')"><i class="fa-regular fa-copy"></i> Copy SQL</button>
+          </div>
+          <pre id="code-vw1">CREATE VIEW vw_order_revenue AS
+SELECT
+    o.order_id,
+    o.order_date,
+    o.status AS order_status,
+    c.customer_id,
+    c.company_name,
+    c.customer_segment,
+    r.region_name,
+    e.first_name || ' ' || e.last_name AS sales_rep,
+    p.product_name,
+    cat.category_name,
+    od.unit_price,
+    od.quantity,
+    od.discount,
+    ROUND(od.unit_price * od.quantity * (1 - od.discount), 2) AS line_revenue
+FROM orders o
+JOIN order_details od ON o.order_id = od.order_id
+JOIN products p ON od.product_id = p.product_id
+JOIN categories cat ON p.category_id = cat.category_id
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN regions r ON c.region_id = r.region_id
+LEFT JOIN employees e ON o.employee_id = e.employee_id;</pre>
+        </div>
+
+        <!-- View 2 -->
+        <div class="code-card">
+          <div class="code-header">
+            <span class="code-title">vw_customer_ltv (Customer Economics Snapshot)</span>
+            <button class="copy-btn" onclick="copyCode('code-vw2')"><i class="fa-regular fa-copy"></i> Copy SQL</button>
+          </div>
+          <pre id="code-vw2">CREATE VIEW vw_customer_ltv AS
+SELECT
+    c.customer_id,
+    c.company_name,
+    c.customer_segment,
+    r.region_name,
+    COUNT(DISTINCT o.order_id) AS total_orders,
+    MIN(o.order_date) AS first_order_date,
+    MAX(o.order_date) AS last_order_date,
+    ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount)), 2) AS total_revenue
+FROM customers c
+JOIN regions r ON c.region_id = r.region_id
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.company_name, c.customer_segment, r.region_name;</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: QUICK START -->
+    <div id="tab-quickstart" class="tab-content">
+      <div class="section-title">Local Execution Pipeline</div>
+      <p class="section-desc">Run the self-contained pipeline on any machine in 3 simple commands.</p>
+
+      <div class="code-card">
+        <div class="code-header">
+          <span class="code-title">Bash Terminal Script</span>
+          <button class="copy-btn" onclick="copyCode('code-bash')"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+        <pre id="code-bash"># 1. Install required packages
+pip install -r requirements.txt
+
+# 2. Build database (schema + sample data + SQL views)
+python python/build_database.py
+
+# 3. Execute automated analysis & generate chart images
+python python/analyze_sales.py</pre>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>Customer Sales Analysis Portfolio • Built with SQLite, Python & Vercel</p>
+    </footer>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div id="imageModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span id="modalTitle" class="modal-title">Chart Preview</span>
+        <button class="close-modal" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-img-wrap">
+        <img id="modalImg" src="" alt="Full Resolution Chart">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    function openModal(imgSrc, title) {
+      document.getElementById('modalImg').src = imgSrc;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('imageModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('imageModal').classList.remove('active');
+    }
+
+    function copyCode(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+      });
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>
