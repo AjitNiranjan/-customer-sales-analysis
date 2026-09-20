@@ -17,6 +17,8 @@ def run_sql_file(conn: sqlite3.Connection, filepath: Path):
     conn.commit()
 
 def main():
+    global DB_PATH
+
     DB_PATH.parent.mkdir(exist_ok=True)
     if DB_PATH.exists():
         try:
@@ -29,7 +31,6 @@ def main():
             if tmp.exists():
                 tmp.unlink()
             print(f"Using temporary path {tmp} due to filesystem constraints")
-            global DB_PATH
             DB_PATH = tmp
 
     print(f"Creating database at {DB_PATH}")
